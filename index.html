@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Status Page</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <main>
+        <div class="header">
+            <h1 class="header-main">
+                Status Page
+            </h1>
+        </div>
+        <div class="main">
+            <div class="components">
+                <div class="statusbar statusbar-operational">
+                    <h2 class="status">
+                        All Systems Operational
+                    </h2>
+                    <button class="statusbar-time">3 Minutes Ago</button>
+                </div>
+                <div class="statusbar statusbar-issues">
+                    <div class="status">
+                        Some systems are having issues
+                    </div>
+                    <button class="statusbar-time">3 Minutes Ago</button>
+                </div>
+                <div class="statusbar statusbar-outage">
+                    <div class="status">
+                        Major Outage
+                    </div>
+                    <button class="statusbar-time">3 Minutes Ago</button>
+                </div>
+                <div class="allcomponents">
+                    <div class="component">
+                        Test
+                        <div class="component-operational component-status">Operational</div>
+                    </div>
+                    <div class="component">
+                        Test
+                        <div class="component-issues component-status">Performance Issues</div>
+                    </div>
+                    <div class="component">
+                        Test
+                        <div class="component-partial component-status">Partial Outage</div>
+                    </div>
+                    <div class="component">
+                        Test
+                        <div class="component-major component-status">Major Outage</div>
+                    </div>
+                    <div class="component">
+                        Test
+                        <div class="component-unknown component-status">Unknown</div>
+                    </div>
+                </div>
+            </div>
+            <div class="incidents-container">
+                <div class="incidents-title">Incidents</div>
+                <div class="incident">
+                    <div class="incident-details">
+                        <div class="incident-created">3 minutes ago</div>
+                        <div class="incident-status incident-status-active">
+                            Active
+                        </div>
+                    </div>
+                    <div class="incident-title">
+                        Title
+                    </div>
+                    <div class="incident-comment">Test Comment</div>
+                </div>
+                <div class="incident">
+                    <div class="incident-details">
+                        <div class="incident-created">3 minutes ago</div>
+                        <div class="incident-status incident-status-closed">
+                            Closed
+                        </div>
+                    </div>
+                    <div class="incident-title">
+                        Title
+                    </div>
+                    <div class="incident-comment">Test Comment</div>
+                </div>
+            </div>
+            <div class="footer">
+                <div></div>
+                <a class="footer-branding" href="https://jorivanee.tech">Built by Jori van Ee</a>
+            </div>
+        </div>
+    </main>
+    <script src="index.js"></script>
+</body>
+
+</html>
