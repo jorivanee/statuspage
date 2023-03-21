@@ -1,0 +1,10 @@
+{
+    "port": 5000,
+    "secret_key": "",
+    "debug": false,
+    "database": {
+        "host": "localhost",
+        "port": 27017,
+        "database": "statuspage"
+    }
+}
