@@ -74,7 +74,8 @@ def _get_components():
     return {
         "data": components,
         "metadata": {
-            "amount": len(components)
+            "amount": len(components),
+            "active": len([x for x in components if x['status']['status'] != "operational"])
         }
     }
 
@@ -160,7 +161,8 @@ def post_create_incident():
         flash("You must select at least one component", "danger")
         return redirect(url_for('admin.get_create_incident'))
     data = {"affected_services": components,
-            "title": request.form['title'], "severity": request.form['severity']}
+            "title": request.form['title'], "severity": request.form['severity'], "created_at": int(time.time(
+            ))*1000}
 
     incident_id = app.database.incidents.insert_one(
         data).inserted_id

@@ -34,7 +34,7 @@ Home Page
                                         {{components.metadata.amount}} Total Components
                                     </div>
                                     <div class="text-muted">
-                                        {{components.metadata.amount}} Components with issues
+                                        {{components.metadata.active}} Components with issues
                                     </div>
                                 </div>
                             </div>
@@ -84,18 +84,19 @@ Home Page
                         <div>
                             <div class="row">
                                 <div class="col-auto">
-                                    <span class="avatar">JL</span>
+                                    <span class="avatar"></span>
                                 </div>
                                 <div class="col">
                                     <div class="text-truncate">
-                                        <strong>{{incident.title}}</strong>
+                                        <a class="link-secondary"
+                                            href="{{url_for('admin.get_incident_by_id', incident=incident['id'])}}">
+                                            <strong>{{incident.title}}</strong>
+                                        </a>
                                     </div>
-                                    <div class="text-muted">yesterday</div>
+                                    <div class="text-muted">{{incident['created_at']|formattime}}</div>
                                 </div>
                                 {% if incident.active %}
-                                <div class="col-auto align-self-center">
-                                    <div class="badge bg-primary"></div>
-                                </div>
+                                <span class="badge bg-red" style="width:5%;height:10%">Active</span>
                                 {% endif %}
                             </div>
                         </div>

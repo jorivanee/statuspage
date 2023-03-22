@@ -90,14 +90,6 @@ def get_status():
     return status
 
 
-# Debug Route to insert an incident
-@ api_blueprint.route("/put")
-def put():
-    app.database.incidents.insert_one({"affected_services": ["6419a760bd28c329260ea6d8"], "created_at": int(time.time(
-    ))*1000, "title": "Novuss Vast Storing", "description": "Novuss Vast is tijdelijk onbereikbaar", "severity": "major"})
-    return jsonify({"success": True})
-
-
 @ api_blueprint.route("/components")
 def components():
     return jsonify(get_components())

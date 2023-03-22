@@ -9,6 +9,7 @@ from blueprints.api import api_blueprint
 from blueprints.admin import admin_blueprint
 from flask_login import LoginManager
 from utils.user import User
+import arrow
 
 isExist = os.path.exists("logs")
 if not isExist:
@@ -49,6 +50,12 @@ def load_user(id):
     return None
 
 
+@app.template_filter('formattime')
+def _jinja2_filter_datetime(date):
+    time = arrow.get(date)
+    return time.humanize().capitalize()
+
+
 def init_mongo(cfg):
     host = cfg['host']
     port = cfg['port']
@@ -65,7 +72,7 @@ if app._debug:
     CORS(app)
 
 
-@app.errorhandler(404)
+@ app.errorhandler(404)
 def error_404(error):
     if (request.path.startswith("/api")):
         return jsonify(error="Resource not found", route=request.path, code=404)
