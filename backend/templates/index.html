@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block title %}
+Home Page
+{% endblock %}
+{% block content %}
+
+<div class="page-body">
+
+    <div class="container-xl">
+        <div class="col-12">
+            <div class="row row-cards">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card card-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <span
+                                        class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="icon icon-tabler icon-tabler-box-multiple" width="24" height="24"
+                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path
+                                                d="M7 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z">
+                                            </path>
+                                            <path d="M17 17v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="col">
+                                    <div class="font-weight-medium">
+                                        {{components.metadata.amount}} Total Components
+                                    </div>
+                                    <div class="text-muted">
+                                        {{components.metadata.amount}} Components with issues
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card card-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <span
+                                        class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="icon icon-tabler icon-tabler-alert-circle" width="24" height="24"
+                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                                            <path d="M12 8v4"></path>
+                                            <path d="M12 16h.01"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="col">
+                                    <div class="font-weight-medium">
+                                        {{incidents.metadata.amount}} Total Incidents
+                                    </div>
+                                    <div class="text-muted">
+                                        {{incidents.metadata.active}} Active Incidents
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="col-12">
+            <div class="card" style="height: 28rem">
+                <div class="card-body card-body-scrollable card-body-scrollable-shadow">
+                    <div class="divide-y">
+                        <h3 class="card-title">Incidents</h3>
+                        {% for incident in incidents['data'] %}
+
+                        <div>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <span class="avatar">JL</span>
+                                </div>
+                                <div class="col">
+                                    <div class="text-truncate">
+                                        <strong>{{incident.title}}</strong>
+                                    </div>
+                                    <div class="text-muted">yesterday</div>
+                                </div>
+                                {% if incident.active %}
+                                <div class="col-auto align-self-center">
+                                    <div class="badge bg-primary"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

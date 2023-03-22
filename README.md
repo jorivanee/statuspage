@@ -3,10 +3,12 @@
 
 
 
-# TODO
+# Todo
+* Add Licenses
+
+
 ## Components:
-* Decide component status based on active incidents affecting it
-* Remove statuspage.settings.status (This can also be calculated from active incidents)
+* Decide component status based on active incidents affecting it (Done)
 
 
 ## Incidents:
@@ -16,6 +18,8 @@
 ## Admin Dashboard:
 * Create Admin Dashboard
 * Basic user management (Admins can create other admins, no permission system needed, full admins only)
-* Create components
+* Create components (Done)
 * Create incidents
+* Close Incidents
+* Edit Incidents
 * Basic settings such as phrases

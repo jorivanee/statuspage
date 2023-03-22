@@ -53,14 +53,15 @@ const Created = styled.div`
   color: #6e6b6b;
   font-weight: bold;
 `;
-
+if (process.env.REACT_APP_LOCALE !== "en") {
+  require(`moment/locale/${process.env.REACT_APP_LOCALE}`);
+  moment.locale(process.env.REACT_APP_LOCALE)
+}
 export default ({ incident }) => (
   <Incident active={incident.closed_at}>
     <Details>
       <Created>
-        {moment(incident.created_at)
-          .format("MMMM Do YYYY, h:mm a")
-          .toUpperCase()}
+        {moment(incident.created_at).calendar().toUpperCase()}
       </Created>
       <Status active={incident.closed_at}>
         {incident.closed_at ? "Closed" : "Active"}

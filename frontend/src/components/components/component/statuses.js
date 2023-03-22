@@ -14,9 +14,5 @@ export default {
   major: {
     colour: "#8e3b31",
     backgroundColour: "rgba(217, 68, 48, 0.1)",
-  },
-  unknown: {
-    colour: "#6e6b6b",
-    backgroundColour: "rgba(177, 177, 177, 0.1)",
-  },
+  }
 };
