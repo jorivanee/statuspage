@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block title %}
+Incidents > {{incident.title}}
+{% endblock %}
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col d-flex flex-column">
+
+                    <form method="post" id="form">
+                        <div class="card-body">
+                            {% with errors = get_flashed_messages(category_filter=["danger"]) %}
+                            {% if errors %}
+                            {%- for message in errors %}
+
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-title">Error</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+                            {% with successes = get_flashed_messages(category_filter=["success"]) %}
+                            {% if successes %}
+                            {%- for message in successes %}
+
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-title">Success</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+                            <h2 class="mb-4">Manage Incident</h2>
+                            <h3 class="card-title mt-4">General Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Incident Name</div>
+                                    <input type="text" name="title" class="form-control" value="{{incident.title}}" {%
+                                        if 'closed_at' in incident %}disabled{% endif %}>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-label">Severity</div>
+                                    <select class="form-select" name="severity" {% if 'closed_at' in incident
+                                        %}disabled{% endif %}>
+                                        <option value="major" {% if 'closed_at' in incident %}disabled{% endif %} {% if
+                                            incident['severity']=='major' %}selected="selected" {% endif %}>Major Outage
+                                        </option>
+                                        <option value="partial" {% if 'closed_at' in incident %}disabled{% endif %} {%
+                                            if incident['severity']=='partial' %}selected="selected" {% endif %}>Partial
+                                            Outage</option>
+                                        <option value="issues" {% if 'closed_at' in incident %}disabled{% endif %} {% if
+                                            incident['severity']=='issues' %}selected="selected" {% endif %}>Issues
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title mt-4">Affected Services</h3>
+                            <div class="row g-3">
+
+                                <div class="form-label">Checkboxes</div>
+                                <div>
+                                    {% for component in components %}
+                                    <label class="form-check">
+                                        <input class="form-check-input" name="components.{{component['id']}}"
+                                            type="checkbox" {% if 'closed_at' in incident %}disabled{% endif %} {% if
+                                            component['id'] in incident['affected_services'] %} checked{% endif%}>
+                                        <span class="form-check-label">{{component.name}}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent mt-auto">
+                            <div class="btn-list justify-content-end">
+                                <a href="{{url_for('admin.get_incidents')}}" class="btn">
+                                    Cancel
+                                </a>
+                                {% if 'closed_at' in incident %}
+                                <a href="{{url_for('admin.open_incident_by_id', incident=incident['id'])}}"
+                                    class="btn btn-primary">
+                                    Reopen
+                                </a>
+                                {% else %}
+                                <a onclick='document.getElementById("form").submit()' class="btn btn-primary">
+                                    Update
+                                </a>
+                                <a href="{{url_for('admin.close_incident_by_id', incident=incident['id'])}}"
+                                    class="btn btn-success">
+                                    Close
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

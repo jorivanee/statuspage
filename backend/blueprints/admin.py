@@ -1,3 +1,4 @@
+import time
 from bson import ObjectId
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask import current_app as app
@@ -29,6 +30,19 @@ def _get_incidents():
     for incident in app.database.incidents.find():
         incident["id"] = str(incident.pop("_id"))
         incident['active'] = "closed_at" not in incident
+        services = []
+        for service in incident['affected_services']:
+            s = app.database.components.find_one({"_id": ObjectId(service)})
+            services.append({"id": service, "name": s['name']})
+        incident['services'] = services
+        severity = incident['severity']
+        status = {"status": "operational", "name": "Operational"}
+        if severity in ['issues', 'partial']:
+            status = {"status": "issues",
+                      "name": "Partial Outage"}
+        if severity in ['major']:
+            status = {"status": "major", "name": "Major Outage"}
+        incident['status'] = status
         incidents.append(incident)
     return {
         "data": incidents,
@@ -120,6 +134,109 @@ def post_create_component():
     return redirect(url_for("admin.get_component_by_id", component=str(component_id)))
 
 
+def get_components_basic():
+    components = []
+    for component in app.database.components.find():
+        components.append(
+            {"name": component['name'], 'id': str(component['_id'])})
+    return components
+
+
+@admin_blueprint.route("/incidents/create", methods=['GET'])
+@login_required
+def get_create_incident():
+    return render_template("/incidents/create.html", components=get_components_basic())
+
+
+@admin_blueprint.route("/incidents/create", methods=['POST'])
+@login_required
+def post_create_incident():
+    components = [arg.split(
+        ".")[1] for arg in request.form if arg.startswith("components.")]
+    if request.form['title'] == "":
+        flash("Name must not be blank", "danger")
+        return redirect(url_for('admin.get_create_incident'))
+    if len(components) < 1:
+        flash("You must select at least one component", "danger")
+        return redirect(url_for('admin.get_create_incident'))
+    data = {"affected_services": components,
+            "title": request.form['title'], "severity": request.form['severity']}
+
+    incident_id = app.database.incidents.insert_one(
+        data).inserted_id
+    return redirect(url_for("admin.get_incident_by_id", incident=str(incident_id)))
+
+
+@admin_blueprint.route("/incidents/<incident>")
+@login_required
+def get_incident_by_id(incident):
+    if not ObjectId.is_valid(incident):
+        return redirect(url_for("admin.get_incidents"))
+    incident_object = app.database.incidents.find_one(
+        {"_id": ObjectId(incident)})
+    if not incident_object:
+        return redirect(url_for("admin.get_incidents"))
+    incident_object['id'] = str(incident_object.pop("_id"))
+    return render_template("incidents/view.html", incident=incident_object, components=get_components_basic())
+
+
+@admin_blueprint.route("/incidents/<incident>/open")
+@login_required
+def open_incident_by_id(incident):
+    if not ObjectId.is_valid(incident):
+        return redirect(url_for("admin.get_incidents"))
+    incident_object = app.database.incidents.find_one(
+        {"_id": ObjectId(incident)})
+    if not incident_object:
+        return redirect(url_for("admin.get_incidents"))
+    app.database.incidents.update_one({"_id": ObjectId(incident)}, {
+        "$unset": {"closed_at": None}})
+    flash("The incident has been reopened", "success")
+    return redirect(url_for('admin.get_incident_by_id', incident=incident))
+
+
+@admin_blueprint.route("/incidents/<incident>/close")
+@login_required
+def close_incident_by_id(incident):
+    if not ObjectId.is_valid(incident):
+        return redirect(url_for("admin.get_incidents"))
+    incident_object = app.database.incidents.find_one(
+        {"_id": ObjectId(incident)})
+    if not incident_object:
+        return redirect(url_for("admin.get_incidents"))
+    app.database.incidents.update_one({"_id": ObjectId(incident)}, {
+        "$set": {"closed_at": int(time.time(
+        ))*1000}})
+    flash("The incident has been closed", "success")
+    return redirect(url_for('admin.get_incident_by_id', incident=incident))
+
+
+@admin_blueprint.route("/incidents/<incident>", methods=['POST'])
+@login_required
+def post_incident_by_id(incident):
+    if not ObjectId.is_valid(incident):
+        return redirect(url_for("admin.get_incidents"))
+    incident_object = app.database.incidents.find_one(
+        {"_id": ObjectId(incident)})
+    if not incident_object:
+        return redirect(url_for("admin.get_components"))
+    components = [arg.split(
+        ".")[1] for arg in request.form if arg.startswith("components.")]
+    if request.form['title'] == "":
+        flash("Name must not be blank", "danger")
+        return redirect(url_for('admin.get_incident_by_id', incident=incident))
+    if len(components) < 1:
+        flash("You must select at least one component", "danger")
+        return redirect(url_for('admin.get_incident_by_id', incident=incident))
+    data = {"affected_services": components,
+            "title": request.form['title'], "severity": request.form['severity']}
+
+    app.database.incidents.update_one({"_id": ObjectId(incident)}, {
+        "$set": data})
+    flash("The incident has been updated", "success")
+    return redirect(url_for('admin.get_incident_by_id', incident=incident))
+
+
 @admin_blueprint.route("/components/<component>")
 @login_required
 def get_component_by_id(component):
@@ -143,13 +260,17 @@ def post_component_by_id(component):
     if not component_object:
         return redirect(url_for("admin.get_components"))
     component_object['name'] = request.form['name']
-    return render_template("components/view.html", component=component_object)
+    app.database.components.update_one({"_id": ObjectId(component)}, {
+                                       "$set": {"name": request.form['name']}})
+    return redirect(url_for('admin.get_component_by_id', component=component))
 
 
 @admin_blueprint.route("/incidents")
 @login_required
 def get_incidents():
-    return render_template("incidents.html")
+    incidents = _get_incidents()
+    print(incidents)
+    return render_template("incidents/list.html", incidents=_get_incidents())
 
 
 @admin_blueprint.route("/users")

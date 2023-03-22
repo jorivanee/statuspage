@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}
+Incidents > Create
+{% endblock %}
+{% block content %}
+
+<div class="page">
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-body">
+                {% with errors = get_flashed_messages(category_filter=["danger"]) %}
+                {% if errors %}
+                {%- for message in errors %}
+
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-title">Error</h4>
+                    <div class="text-muted">{{ message }}</div>
+                </div>
+                {% endfor -%}
+                {% endif %}
+                {% endwith %}
+                <form method="post" id="form">
+                    <h3 class="card-title mt-4">General Information</h3>
+                    <div class="row g-3">
+                        <div class="col-md">
+                            <div class="form-label">Incident Name</div>
+                            <input type="text" name="title" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-label">Severity</div>
+                            <select class="form-select" name="severity" {% if 'closed_at' in incident %}disabled{% endif
+                                %}>
+                                <option value="major">Major Outage
+                                </option>
+                                <option value="partial">Partial
+                                    Outage</option>
+                                <option value="issues">Issues
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title mt-4">Affected Services</h3>
+                        <div class="row g-3">
+
+                            <div class="form-label">Checkboxes</div>
+                            <div>
+                                {% for component in components %}
+                                <label class="form-check">
+                                    <input class="form-check-input" name="components.{{component['id']}}"
+                                        type="checkbox">
+                                    <span class="form-check-label">{{component.name}}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary w-100">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}

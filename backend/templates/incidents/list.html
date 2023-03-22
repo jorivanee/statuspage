@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block title %}
+Incidents
+{% endblock %}
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="card-body">
+                <div id="table-default" class="table-responsive">
+                    <a href="{{url_for('admin.get_create_incident')}}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
+                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>Create New</a>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><button class="table-sort" data-sort="sort-title">Title</button></th>
+                                <th><button class="table-sort" data-sort="sort-status">Severity</button></th>
+                                <th><button class="table-sort" data-sort="sort-affected">Affected Services</button></th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-tbody">
+                            {% for incident in incidents['data'] %}
+
+                            <tr>
+                                <td class="sort-title"><a class="link-secondary" style="color:white"
+                                        href="{{url_for('admin.get_incident_by_id', incident=incident['id'])}}">{{incident['title']}}</a>
+                                </td>
+                                <td class="sort-severity">{{incident['status']['name']}}</td>
+                                <td class="sort-affected">
+                                    {% for service in incident['services'] %}
+                                    {{service['name']}}<br>
+                                    {% endfor %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

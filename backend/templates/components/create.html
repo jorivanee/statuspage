@@ -6,9 +6,8 @@ Components > Create
 
 <div class="page">
     <div class="container py-4">
-        <div class="card card-md">
+        <div class="card">
             <div class="card-body">
-                <h2 class="h2 text-center mb-4">Create new component</h2>
                 {% with errors = get_flashed_messages(category_filter=["danger"]) %}
                 {% if errors %}
                 {%- for message in errors %}
