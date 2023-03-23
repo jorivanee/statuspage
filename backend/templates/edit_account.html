@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title %}
+Edit Account
+{% endblock %}
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col d-flex flex-column">
+                    <form method="post" id="form">
+
+                        <div class="card-body">
+
+                            {% with errors = get_flashed_messages(category_filter=["danger"]) %}
+                            {% if errors %}
+                            {%- for message in errors %}
+
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-title">Error</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+
+                            {% with errors = get_flashed_messages(category_filter=["success"]) %}
+                            {% if errors %}
+                            {%- for message in errors %}
+
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-title">Success</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+
+                            <h2 class="mb-4">Manage Account</h2>
+                            <h3 class="card-title mt-4">General Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Email Address</div>
+                                    <input type="email" name="email" class="form-control"
+                                        value="{{current_user.email}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title mt-4">Password</h3>
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Current Password</div>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                                <div class="col-md">
+                                    <div class="form-label">New Password</div>
+                                    <input type="password" name="password.new" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent mt-auto">
+                            <div class="btn-list justify-content-end">
+                                <a onclick='document.getElementById("form").submit()' class="btn btn-primary">
+                                    Update
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

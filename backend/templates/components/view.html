@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}
+Components > {{component.name}}
+{% endblock %}
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col d-flex flex-column">
+                    <form method="post" id="form">
+                        <div class="card-body">
+                            <h2 class="mb-4">Manage Component</h2>
+                            <h3 class="card-title mt-4">General Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Component Name</div>
+                                    <input type="text" name="name" class="form-control" value="{{component.name}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent mt-auto">
+                            <div class="btn-list justify-content-end">
+                                <a href="{{url_for('admin.get_components')}}" class="btn">
+                                    Cancel
+                                </a>
+                                <a onclick='document.getElementById("form").submit()' class="btn btn-primary">
+                                    Update
+                                </a>
+                                <a href="{{url_for('admin.get_delete_component', component=component['id'])}}"
+                                    class="btn btn-danger">
+                                    Delete
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

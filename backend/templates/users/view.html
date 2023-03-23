@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block title %}
+Users > {{user.email}}
+{% endblock %}
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col d-flex flex-column">
+                    <form method="post" id="form">
+                        <div class="card-body">
+                            {% with errors = get_flashed_messages(category_filter=["danger"]) %}
+                            {% if errors %}
+                            {%- for message in errors %}
+
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-title">Error</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+
+                            {% with errors = get_flashed_messages(category_filter=["success"]) %}
+                            {% if errors %}
+                            {%- for message in errors %}
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-title">Success</h4>
+                                <div class="text-muted">{{ message }}</div>
+                            </div>
+                            {% endfor -%}
+                            {% endif %}
+                            {% endwith %}
+                            <h2 class="mb-4">Manage User</h2>
+                            <h3 class="card-title mt-4">General Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Email Address</div>
+                                    <input type="text" name="email" class="form-control" value="{{user.email}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md">
+                                    <div class="form-label">Update Password</div>
+                                    <input type="password" name="password" class="form-control">
+                                    <span class="form-check-description">The user will not get a notification if you
+                                        change their password</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent mt-auto">
+                            <div class="btn-list justify-content-end">
+                                <a href="{{url_for('admin.get_users')}}" class="btn">
+                                    Cancel
+                                </a>
+                                <a onclick='document.getElementById("form").submit()' class="btn btn-primary">
+                                    Update
+                                </a>
+                                <a href="{{url_for('admin.get_delete_user', user=user['id'])}}" class="btn btn-danger">
+                                    Delete
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
