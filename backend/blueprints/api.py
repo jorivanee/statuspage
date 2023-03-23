@@ -97,7 +97,7 @@ def components():
 
 @ api_blueprint.route("/incidents")
 def incidents():
-    return jsonify(get_incidents)
+    return jsonify(get_incidents())
 
 
 @ api_blueprint.route("/status")

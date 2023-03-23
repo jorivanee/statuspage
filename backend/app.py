@@ -74,7 +74,7 @@ if app._debug:
 
 @ app.errorhandler(404)
 def error_404(error):
-    if (request.blueprint == "api"):
+    if (request.path.startswith("/api")):
         return jsonify(error="Resource not found", route=request.path, code=404)
     return render_template("error404.html")
 

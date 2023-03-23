@@ -2,3 +2,5 @@ flask
 requests
 flask_cors
 arrow
+flask_login
+pymongo
