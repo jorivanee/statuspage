@@ -19,11 +19,12 @@ export default () =>
   process.env.REACT_APP_LOGO || process.env.REACT_APP_NAME ? (
     <Header>
       {process.env.REACT_APP_LOGO ? (
+        <a href={process.env.REACT_APP_LOGO_LINK}>
         <Logo
           src={process.env.REACT_APP_LOGO}
           alt={process.env.REACT_APP_NAME}
-          href={process.env.REACT_APP_LOGO_LINK}
-        />
+          
+        /></a>
       ) : (
         <Title>{process.env.REACT_APP_NAME}</Title>
       )}
