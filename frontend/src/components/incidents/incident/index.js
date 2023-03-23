@@ -52,19 +52,24 @@ const Created = styled.div`
   font-size: 13px;
   color: #6e6b6b;
   font-weight: bold;
+  ::first-letter {
+    text-transform:capitalize;
+  }
 `;
 if (process.env.REACT_APP_LOCALE !== "en") {
   require(`moment/locale/${process.env.REACT_APP_LOCALE}`);
   moment.locale(process.env.REACT_APP_LOCALE)
 }
+const closed = process.env.REACT_APP_LOCALE === "nl" ? "Gesloten" : "Closed";
+const active = process.env.REACT_APP_LOCALE === "nl" ? "Actief" : "Gesloten";
 export default ({ incident }) => (
   <Incident active={incident.closed_at}>
     <Details>
       <Created>
-        {moment(incident.created_at).calendar().toUpperCase()}
+        {moment(incident.created_at).calendar()}
       </Created>
       <Status active={incident.closed_at}>
-        {incident.closed_at ? "Closed" : "Active"}
+        {incident.closed_at ? closed : active}
       </Status>
     </Details>
     <Title>{incident.title}</Title>

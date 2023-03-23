@@ -6,5 +6,21 @@
         "host": "localhost",
         "port": 27017,
         "database": "statuspage"
+    },
+    "phrases": {
+        "major_outage": {
+            "all": "All services are experiencing a major outage",
+            "some": "Some services are experiencing a major outage",
+            "component": "Major Outage"
+        },
+        "partial": {
+            "all": "All services are experiencing some issues",
+            "some": "Some services are experiencing some issues",
+            "component": "Partial Outage"
+        },
+        "operational": {
+            "all": "All services are operational",
+            "component": "Operational"
+        }
     }
 }

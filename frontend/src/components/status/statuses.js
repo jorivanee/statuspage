@@ -2,8 +2,8 @@ export default {
   operational: {
     backgroundColour: "#3da751",
   },
-  issues: {
-    backgroundColour: "#4990e2",
+  partial: {
+    backgroundColour: "#ffa837",
   },
   major: {
     backgroundColour: "#d94430",

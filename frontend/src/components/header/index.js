@@ -7,7 +7,8 @@ const Title = styled.h1`
   margin-bottom: 0;
 `;
 
-const Logo = styled.img``;
+const Logo = styled.img`
+width: 30%`;
 
 const Header = styled.div`
   text-align: center;

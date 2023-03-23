@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify
 from flask import current_app as app
-import time
 
 api_blueprint = Blueprint("api", __name__)
 
@@ -23,17 +22,18 @@ def get_components():
     components = []
     for component in app.database.components.find():
         status = {"status": "operational",
-                  "name": "Operational"}
+                  "name": app._config['phrases']['operational']['component']}
         component["id"] = str(component.pop("_id"))
         components.append(component)
         active_incidents = get_incidents_by_id(component['id'])
         statuses = [incident['severity']
                     for incident in active_incidents]
-        if "issues" in statuses or "partial" in statuses:
-            status = {"status": "issues",
-                      "name": "Partial Outage"}
+        if "partial" in statuses:
+            status = {"status": "partial",
+                      "name": app._config['phrases']['partial']['component']}
         if "major" in statuses:
-            status = {"status": "major", "name": "Major Outage"}
+            status = {"status": "major",
+                      "name": app._config['phrases']['major']['component']}
         component['status'] = status
         component['incidents'] = {"metadata": {
             "amount": len(active_incidents)}, "data": active_incidents}
@@ -74,19 +74,19 @@ def get_incidents():
 
 def get_status():
     status = {"status": "operational",
-              "text": "All Services Operational", "timeago": "3 minuten geleden"}
+              "text": app._config['phrases']['operational']['all'], "timeago": "Reload"}
     statuses = [component['status']['status']
                 for component in get_components()['data']]
-    if "issues" in statuses:
-        status['status'] = 'issues'
-        status['text'] = "Some services are having issues"
+    if "partial" in statuses:
+        status['status'] = 'partial'
+        status['text'] = app._config['phrases']['partial']['some']
         if (allEqual(statuses)):
-            status['text'] = "All services are having issues"
+            status['text'] = app._config['phrases']['partial']['all']
     if "major" in statuses:
         status['status'] = 'major'
-        status['text'] = "Some services are experiencing a major outage"
+        status['text'] = app._config['phrases']['major']['some']
         if (allEqual(statuses)):
-            status['text'] = "All services are experiencing a major outage"
+            status['text'] = app._config['phrases']['major']['all']
     return status
 
 

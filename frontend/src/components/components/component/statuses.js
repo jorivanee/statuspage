@@ -3,10 +3,6 @@ export default {
     colour: "#247234",
     backgroundColour: "rgba(61, 167, 81, 0.1)",
   },
-  issues: {
-    colour: "#2f5888",
-    backgroundColour: "rgba(73, 144, 226, 0.1)",
-  },
   partial: {
     colour: "#74582a",
     backgroundColour: "rgba(255, 198, 103, 0.1)",
