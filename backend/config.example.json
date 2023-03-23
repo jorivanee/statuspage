@@ -8,7 +8,7 @@
         "database": "statuspage"
     },
     "phrases": {
-        "major_outage": {
+        "major": {
             "all": "All services are experiencing a major outage",
             "some": "Some services are experiencing a major outage",
             "component": "Major Outage"
