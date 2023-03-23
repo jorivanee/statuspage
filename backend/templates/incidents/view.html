@@ -51,9 +51,6 @@ Incidents > {{incident.title}}
                                         <option value="partial" {% if 'closed_at' in incident %}disabled{% endif %} {%
                                             if incident['severity']=='partial' %}selected="selected" {% endif %}>Partial
                                             Outage</option>
-                                        <option value="issues" {% if 'closed_at' in incident %}disabled{% endif %} {% if
-                                            incident['severity']=='issues' %}selected="selected" {% endif %}>Issues
-                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -94,6 +91,10 @@ Incidents > {{incident.title}}
                                     Close
                                 </a>
                                 {% endif %}
+                                <a href="{{url_for('admin.get_delete_incident', incident=incident['id'])}}"
+                                    class="btn btn-danger">
+                                    Delete
+                                </a>
                             </div>
                         </div>
                     </form>

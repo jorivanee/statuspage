@@ -1,6 +1,7 @@
 import time
+from urllib.parse import urlparse, urljoin
 from bson import ObjectId
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, session, url_for, flash
 from flask import current_app as app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user, logout_user
@@ -9,6 +10,13 @@ from utils.user import User
 
 admin_blueprint = Blueprint(
     "admin", __name__)
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+        ref_url.netloc == test_url.netloc
 
 
 def get_incidents_by_id(component_id):
@@ -33,12 +41,16 @@ def _get_incidents():
         services = []
         for service in incident['affected_services']:
             s = app.database.components.find_one({"_id": ObjectId(service)})
-            services.append({"id": service, "name": s['name']})
+            if s:
+                services.append({"id": service, "name": s['name']})
+        if len(services) != len(incident['affected_services']):
+            app.database.components.update_one({"_id": ObjectId(service)}, {
+                                               "$set": {"affected_services": [x['id'] for x in services]}})
         incident['services'] = services
         severity = incident['severity']
         status = {"status": "operational", "name": "Operational"}
-        if severity in ['issues', 'partial']:
-            status = {"status": "issues",
+        if severity in ['partial']:
+            status = {"status": "partial",
                       "name": "Partial Outage"}
         if severity in ['major']:
             status = {"status": "major", "name": "Major Outage"}
@@ -63,8 +75,8 @@ def _get_components():
         active_incidents = get_incidents_by_id(component['id'])
         statuses = [incident['severity']
                     for incident in active_incidents]
-        if "issues" in statuses or "partial" in statuses:
-            status = {"status": "issues",
+        if "partial" in statuses:
+            status = {"status": "partial",
                       "name": "Partial Outage"}
         if "major" in statuses:
             status = {"status": "major", "name": "Major Outage"}
@@ -119,12 +131,33 @@ def get_delete_component(component):
     return render_template("/components/delete_confirm.html", component=component_object)
 
 
+@admin_blueprint.route("/incidents/<incident>/delete", methods=['POST'])
+@login_required
+def post_delete_incident(incident):
+    if ObjectId.is_valid(incident):
+        app.database.incidents.delete_one({"_id": ObjectId(incident)})
+    return redirect(url_for("admin.get_incidents"))
+
+
+@admin_blueprint.route("/incidents/<incident>/delete", methods=['get'])
+@login_required
+def get_delete_incident(incident):
+    if not ObjectId.is_valid(incident):
+        return redirect(url_for("admin.get_incidents"))
+    incident_object = app.database.incidents.find_one(
+        {"_id": ObjectId(incident)})
+    if not incident_object:
+        return redirect(url_for("admin.get_incidents"))
+    incident_object['id'] = str(incident_object.pop("_id"))
+    return render_template("/incidents/delete_confirm.html", incident=incident_object)
+
+
 @admin_blueprint.route("/components/create", methods=['POST'])
 @login_required
 def post_create_component():
     name = request.form['name'].strip()
     if not name:
-        flash("Please enter a component name", "danger")
+        flash("Name must not be blank", "danger")
         return render_template("/components/create.html")
     component = app.database.components.find_one({"name": name})
     if component:
@@ -213,6 +246,27 @@ def close_incident_by_id(incident):
     return redirect(url_for('admin.get_incident_by_id', incident=incident))
 
 
+@admin_blueprint.route("/users/<user>/delete", methods=['POST'])
+@login_required
+def post_delete_user(user):
+    if ObjectId.is_valid(user):
+        app.database.users.delete_one({"_id": ObjectId(user)})
+    return redirect(url_for("admin.get_users"))
+
+
+@admin_blueprint.route("/users/<user>/delete", methods=['get'])
+@login_required
+def get_delete_user(user):
+    if not ObjectId.is_valid(user):
+        return redirect(url_for("admin.get_users"))
+    user_object = app.database.users.find_one(
+        {"_id": ObjectId(user)})
+    if not user_object:
+        return redirect(url_for("admin.get_users"))
+    user_object['id'] = str(user_object.pop("_id"))
+    return render_template("/users/delete_confirm.html", user=user_object)
+
+
 @admin_blueprint.route("/incidents/<incident>", methods=['POST'])
 @login_required
 def post_incident_by_id(incident):
@@ -270,15 +324,83 @@ def post_component_by_id(component):
 @admin_blueprint.route("/incidents")
 @login_required
 def get_incidents():
-    incidents = _get_incidents()
-    print(incidents)
     return render_template("incidents/list.html", incidents=_get_incidents())
 
 
 @admin_blueprint.route("/users")
 @login_required
 def get_users():
-    return render_template("incidents.html")
+    users = []
+    for user in app.database.users.find():
+        users.append({'id': str(user['_id']), 'email': user['email']})
+    return render_template("users/list.html", users=users)
+
+
+@admin_blueprint.route("/users/<user>")
+@login_required
+def get_user_by_id(user):
+    if not ObjectId.is_valid(user):
+        return redirect(url_for("admin.get_users"))
+    user_object = app.database.users.find_one(
+        {"_id": ObjectId(user)})
+    if not user_object:
+        return redirect(url_for("admin.get_users"))
+    user_object['id'] = str(user_object.pop("_id"))
+    user_object.pop('password')
+    return render_template("users/view.html", user=user_object)
+
+
+@admin_blueprint.route("/users/<user>", methods=['POST'])
+@login_required
+def post_user_by_id(user):
+    if not ObjectId.is_valid(user):
+        return redirect(url_for("admin.get_users"))
+    user_object = app.database.users.find_one(
+        {"_id": ObjectId(user)})
+    if not user_object:
+        return redirect(url_for("admin.get_users"))
+    user_object['id'] = str(user_object.pop("_id"))
+    user_object.pop('password')
+    email = request.form['email']
+    password = request.form['password']
+    update = {}
+    if not email:
+        flash("Email cannot be empty", 'danger')
+        return redirect(url_for('admin.get_user_by_id', user=user))
+    if email != user_object['email']:
+        update['email'] = email
+    if password:
+        update['password'] = generate_password_hash(password, method='sha256')
+    if len(update) < 1:
+        return redirect(url_for('admin.get_user_by_id', user=user))
+    app.database.users.update_one({"_id": ObjectId(user)}, {
+        "$set": update})
+    flash("The user has been updated", "success")
+    return redirect(url_for('admin.get_user_by_id', user=user))
+
+
+@admin_blueprint.route("/users/create")
+@login_required
+def get_create_user():
+    return render_template("users/create.html")
+
+
+@admin_blueprint.route("/users/create", methods=['POST'])
+@login_required
+def post_create_user():
+    email = request.form.get('email')
+    user = app.database.users.find_one({"email": email})
+    if not email:
+        flash("Email must not be empty", "danger")
+        return render_template("users/create.html")
+    if user:
+        flash("A user with this email address already exists", "danger")
+        return render_template("users/create.html")
+    password = request.form.get('password')
+    password = generate_password_hash(password, method='sha256')
+    record = app.database.users.insert_one(
+        {"password": password, "email": email}).inserted_id
+    return redirect(url_for("admin.get_user_by_id", user=str(record)))
 
 
 @admin_blueprint.route("/login", methods=['GET'])
@@ -306,18 +428,21 @@ def post_login_page():
         flash('Please check your login details and try again.', "danger")
         return render_template("login.html")
     login_user(User(user))
+    if not is_safe_url(request.args.get('next')):
+        return redirect(url_for("admin.homepage"))
     return redirect(request.args.get('next') or url_for('admin.homepage'))
 
 
-@ admin_blueprint.route("/signup", methods=['GET'])
+@admin_blueprint.route("/signup", methods=['GET'])
 def signup_page():
+    session.pop('_flashes', None)
     users = app.database.users.count_documents({})
     if users > 0:
         return render_template("signup_blocked.html")
     return render_template("signup.html")
 
 
-@ admin_blueprint.route("/signup", methods=['POST'])
+@admin_blueprint.route("/signup", methods=['POST'])
 def post_signup_page():
     users = app.database.users.count_documents({})
     if users > 0:
@@ -325,5 +450,35 @@ def post_signup_page():
     email = request.form.get('email')
     password = request.form.get('password')
     password = generate_password_hash(password, method='sha256')
-    app.database.users.insert_one({"password": password, "email": email})
+    inserted_id = app.database.users.insert_one(
+        {"password": password, "email": email}).inserted_id
+    user = app.database.users.find_one({"_id": inserted_id})
+    login_user(User(user))
     return redirect(url_for("admin.homepage"))
+
+
+@admin_blueprint.route("/settings")
+def account_settings():
+    return render_template("edit_account.html")
+
+
+@admin_blueprint.route("/settings", methods=['POST'])
+def post_account_settings():
+    email = request.form['email']
+    password = request.form['password']
+    newpassword = request.form['password.new']
+    data = {}
+    if email != current_user.email:
+        if not email:
+            flash("Email can not be empty", "danger")
+            return render_template("edit_account.html")
+        data['email'] = email
+    if newpassword:
+        if not check_password_hash(current_user.password, password):
+            flash("Invalid Password", "danger")
+            return render_template("edit_account.html")
+        data['password'] = generate_password_hash(newpassword, method="sha256")
+    app.database.users.update_one(
+        {"_id": ObjectId(current_user.id)}, {"$set": data})
+    flash("Your account has been updated", "success")
+    return render_template("edit_account.html")
