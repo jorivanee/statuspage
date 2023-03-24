@@ -38,7 +38,7 @@ with open("config.json", "r") as jsonfile:
 app._debug = app._config['debug']
 login_manager = LoginManager()
 login_manager.login_view = 'admin.login'
-login_manager.init_app(app)
+login_manager.init_app(app) 
 login_manager.login_message_category = "danger"
 
 
@@ -70,6 +70,11 @@ app.config['SECRET_KEY'] = app._config['secret_key']
 if app._debug:
     # Allowing cors on develop because the react frontend and flask backend are hosted on separate ports, and it wouldn't allow the react app to access the API
     CORS(app)
+
+
+@app.context_processor
+def inject_variables():
+    return {"dark_theme": app._config['dark_theme']}
 
 
 @ app.errorhandler(404)

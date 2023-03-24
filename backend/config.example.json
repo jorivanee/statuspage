@@ -22,5 +22,6 @@
             "all": "All services are operational",
             "component": "Operational"
         }
-    }
+    },
+    "dark_theme": false
 }
