@@ -441,6 +441,35 @@ def signup_page():
         return render_template("signup_blocked.html")
     return render_template("signup.html")
 
+@admin_blueprint.route("/settings/global")
+def get_settings_global():
+    return render_template("settings/global.html")
+
+
+@admin_blueprint.route("/settings/global", methods=['POST'])
+def post_settings_global():
+    form = request.form
+    keys = ['image_url','image_link','footer_link','footer_text','title']
+    changed_keys = []
+    for key in keys:
+        setting = app.database.settings.find_one({"key": key})['value']
+        if key in form:
+            if setting != form[key]:
+                app.database.settings.update_one(
+                    {"key": key}, {"$set": {"value": form[key]}})
+                changed_keys.append(key)
+        else:
+            app.database.settings.update_one(
+                    {"key": key}, {"$set": {"value": None}})
+            changed_keys.append(key)
+    if len(changed_keys) < 1:
+        return redirect(url_for('admin.get_settings_global'))
+
+    app.update_config()
+    flash("The settings have been updated", "success")
+    return redirect(url_for('admin.get_settings_global'))
+
+
 
 @admin_blueprint.route("/signup", methods=['POST'])
 def post_signup_page():
@@ -464,21 +493,30 @@ def account_settings():
 
 @admin_blueprint.route("/settings", methods=['POST'])
 def post_account_settings():
-    email = request.form['email']
     password = request.form['password']
     newpassword = request.form['password.new']
     data = {}
-    if email != current_user.email:
-        if not email:
-            flash("Email can not be empty", "danger")
-            return render_template("edit_account.html")
-        data['email'] = email
+    if "dark_theme" in request.form and request.form['dark_theme'] == "on":
+        if not current_user.dark_theme:
+            data['dark_theme'] = True
+    else:
+        if current_user.dark_theme:
+            data['dark_theme'] = False
+    if "email" in request.form:
+        email = request.form['email']
+        if email != current_user.email:
+            if not email:
+                flash("Email can not be empty", "danger")
+                return render_template("edit_account.html")
+            data['email'] = email
     if newpassword:
         if not check_password_hash(current_user.password, password):
             flash("Invalid Password", "danger")
             return render_template("edit_account.html")
         data['password'] = generate_password_hash(newpassword, method="sha256")
+    if len(data) < 1:
+        return redirect(url_for("admin.account_settings"))
     app.database.users.update_one(
         {"_id": ObjectId(current_user.id)}, {"$set": data})
     flash("Your account has been updated", "success")
-    return render_template("edit_account.html")
+    return redirect(url_for("admin.account_settings"))

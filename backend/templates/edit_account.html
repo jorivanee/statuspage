@@ -35,14 +35,23 @@ Edit Account
                             {% endfor -%}
                             {% endif %}
                             {% endwith %}
-
                             <h2 class="mb-4">Manage Account</h2>
                             <h3 class="card-title mt-4">General Information</h3>
-                            <div class="row g-3">
+                            <div class="row mb-3">
                                 <div class="col-md">
                                     <div class="form-label">Email Address</div>
-                                    <input type="email" name="email" class="form-control"
-                                        value="{{current_user.email}}">
+                                    <input type="email" name="email" class="form-control" value="{{current_user.email}}">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md">
+                                    <label class="form-check form-switch">
+                                        <input class="form-check-input"
+                                            onchange="document.getElementById('body').classList.toggle('theme-dark');"
+                                            type="checkbox" name="dark_theme" {% if dark_theme %}checked{% endif %}>
+                                        <div class="form-label">Dark Theme</div>
+                                    </label>
                                 </div>
                             </div>
                         </div>

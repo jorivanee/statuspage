@@ -19,15 +19,15 @@ const Branding = styled.a`
   }
 `;
 
-export default () => (
+export default ({metadata}) => (
   <Footer>
     <div></div>
     <Branding
-      href="https://github.com/jorivanee/statuspage"
+      href={metadata['footer_link']}
       rel="noopener"
       target="_blank"
     >
-      {process.env.REACT_APP_FOOTER || "Powered by Jori van Ee's Status Page"}
+      {process.env.REACT_APP_FOOTER || metadata['footer_text']}
       
     </Branding>
   </Footer>

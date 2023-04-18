@@ -1,0 +1,52 @@
+{% extends "settings/layout.html" %}
+{% block settings_title %}
+Global Settings
+{% endblock %}
+{% block settings_content %}
+<h3 class="card-title mt-4">General Settings</h3>
+<div class="row g-3">
+    <div class="col-md">
+        <div class="form-label">Application Name</div>
+        <input type="text" class="form-control" name="title" value="{{title}}">
+    </div>
+</div>
+
+<h3 class="card-title mt-4">Image</h3>
+<div>
+    <div class="row g-2">
+        <div class="col-auto">
+            <div class="form-label">Image URL</div>
+
+            <input type="text" class="form-control w-auto" name="image_url" value="{% if image_url %}{{image_url}}{% endif %}">
+        </div>
+    </div>
+</div>
+<div>
+    <div class="row g-2">
+        <div class="col-auto">
+            <div class="form-label">Image Link</div>
+
+            <input type="text" class="form-control w-auto" name="image_link" value="{% if image_link %}{{image_link}}{% endif %}">
+        </div>
+    </div>
+</div>
+<h3 class="card-title mt-4">Footer</h3>
+<div>
+    <div class="row g-2">
+        <div class="col-auto">
+            <div class="form-label">Footer Text</div>
+
+            <input type="text" class="form-control w-auto" name="footer_text" value="{{footer_text}}">
+        </div>
+    </div>
+</div>
+<div>
+    <div class="row g-2">
+        <div class="col-auto">
+            <div class="form-label">Footer Link</div>
+
+            <input type="text" class="form-control w-auto" name="footer_link" value="{{footer_link}}">
+        </div>
+    </div>
+</div>
+{% endblock %}

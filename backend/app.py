@@ -7,7 +7,7 @@ import logging
 from flask_cors import CORS
 from blueprints.api import api_blueprint
 from blueprints.admin import admin_blueprint
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from utils.user import User
 import arrow
 
@@ -38,7 +38,7 @@ with open("config.json", "r") as jsonfile:
 app._debug = app._config['debug']
 login_manager = LoginManager()
 login_manager.login_view = 'admin.login'
-login_manager.init_app(app) 
+login_manager.init_app(app)
 login_manager.login_message_category = "danger"
 
 
@@ -63,6 +63,38 @@ def init_mongo(cfg):
     app.db_client = MongoClient(host, port)
     app.database = app.db_client[db]
 
+config_keys = ['image_link', 'footer_text',
+            'footer_link', 'image_url', 'title']
+
+
+@app.context_processor
+def inject_variables():
+    data = {}
+    for key in config_keys:
+        data[key] = app._config[key]
+    if current_user.is_authenticated:
+        data['dark_theme'] = current_user.dark_theme
+    else:
+        data['dark_theme'] = False
+    return data
+
+
+def initialize_database():
+    settings_insert = []
+    defaults = { 
+        "footer_text": "Powered by Jori van Ee's Status Page",
+        "footer_link": "https://github.com/jorivanee/statuspage",
+        "image_url": None, 
+        "image_link": None,
+        "title":"Status Page"
+    }
+    for key, value in defaults.items():
+        data = app.database.settings.find_one({"key": key})
+        if not data:
+            settings_insert.append({"key": key, "value": value})
+    if len(settings_insert) > 0:
+        app.database.settings.insert_many(settings_insert)
+
 
 init_mongo(app._config['database'])
 app.config['SECRET_KEY'] = app._config['secret_key']
@@ -71,10 +103,10 @@ if app._debug:
     # Allowing cors on develop because the react frontend and flask backend are hosted on separate ports, and it wouldn't allow the react app to access the API
     CORS(app)
 
-
-@app.context_processor
-def inject_variables():
-    return {"dark_theme": app._config['dark_theme']}
+def update_config():
+    for key in config_keys:
+        app._config[key] = app.database.settings.find_one({"key": key})[
+            'value']
 
 
 @ app.errorhandler(404)
@@ -86,6 +118,8 @@ def error_404(error):
 
 app.register_blueprint(api_blueprint, url_prefix="/api")
 app.register_blueprint(admin_blueprint, url_prefix="/admin")
-
+initialize_database()
+update_config()
+app.update_config = update_config
 if __name__ == '__main__':
     app.run(debug=app._debug, port=app._config['port'])

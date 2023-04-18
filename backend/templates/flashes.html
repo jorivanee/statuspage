@@ -1,0 +1,16 @@
+{% macro danger_flashes() %}
+{% with flashes =
+get_flashed_messages(category_filter=["danger"]) %}{% if flashes %}{% for message in flashes %}
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-title">Error</h4>
+    <div class="text-muted">{{ message }}</div>
+</div>{% endfor %}{% endif %}{% endwith %}
+{% endmacro %}
+{% macro success_flashes() %}
+{% with flashes =
+get_flashed_messages(category_filter=["success"]) %}{% if flashes %}{% for message in flashes %}
+<div class="alert alert-success" role="success">
+    <h4 class="alert-title">Success</h4>
+    <div class="text-muted">{{ message }}</div>
+</div>{% endfor %}{% endif %}{% endwith %}
+{% endmacro %}

@@ -15,13 +15,13 @@ const Header = styled.div`
   margin-bottom: 16px;
 `;
 
-export default () =>
-  process.env.REACT_APP_LOGO || process.env.REACT_APP_NAME ? (
+export default ({metadata}) =>
+  metadata['image_url'] || process.env.REACT_APP_NAME ? (
     <Header>
-      {process.env.REACT_APP_LOGO ? (
-        <a href={process.env.REACT_APP_LOGO_LINK}>
+      {metadata['image_url'] ? (
+        <a href={metadata['image_link']}>
         <Logo
-          src={process.env.REACT_APP_LOGO}
+          src={metadata['image_url']}
           alt={process.env.REACT_APP_NAME}
           
         /></a>

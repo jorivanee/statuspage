@@ -19,26 +19,30 @@ const ComponentsContainer = styled.div`
   padding: 16px;
 `;
 
-export default function App () {
+export default function App() {
   const [loading, setLoading] = React.useState(true);
   const [status, setStatus] = React.useState({});
   const [error, setError] = React.useState("");
-  useEffect(()=>{
-    if(loading){
+  const [metadata, setMetadata] = React.useState({})
+  useEffect(() => {
+    if (loading) {
       update();
     }
   })
   const update = () => {
-    fetch(`${process.env.REACT_APP_API_BASE_URL}/status/raw`).then((response)=>{return response.json();}).then((data)=>{
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/status/raw`).then((response) => { return response.json(); }).then((data) => {
       setStatus(data);
+      setMetadata(data['metadata'])
+      document.title = data['metadata']['title']
       setLoading(false);
-    }).catch((error)=>{
+    }).catch((error) => {
       setError("An unknown error occurred")
     })
   }
   return (
     <Container>
-      <Header />
+      <Header
+        metadata={metadata} />
       <ComponentsContainer>
         <Status
           loading={loading}
@@ -56,8 +60,10 @@ export default function App () {
           components={status['components']}
         />
       </ComponentsContainer>
-      <Incidents loading={loading} incidents={status['incidents']} />
-      <Footer />
+      <Incidents
+        loading={loading} incidents={status['incidents']} />
+      <Footer
+        metadata={metadata} />
     </Container>
   );
 };

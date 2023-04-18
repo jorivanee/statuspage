@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <div class="page {% if dark_theme %}theme-dark{% endif %}">
+    <div id="body" class="page {% if dark_theme %}theme-dark{% endif %}">
         <header class="navbar navbar-expand-md navbar-light d-print-none">
             <div class="container-xl">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
@@ -154,6 +154,32 @@
                                                 </span>
                                             </a>
                                         </div>
+                                    </div>
+                                    <div class="dropdown-menu-column">
+                                        <a class="dropdown-item" href="{{url_for('admin.get_settings_global')}}">
+                                            <span
+                                                class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="icon icon-tabler icon-tabler-adjustments-horizontal"
+                                                    width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                    stroke="currentColor" fill="none" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <path d="M14 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                    <path d="M4 6l8 0"></path>
+                                                    <path d="M16 6l4 0"></path>
+                                                    <path d="M8 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                    <path d="M4 12l2 0"></path>
+                                                    <path d="M10 12l10 0"></path>
+                                                    <path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                    <path d="M4 18l11 0"></path>
+                                                    <path d="M19 18l1 0"></path>
+                                                </svg>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Settings
+                                            </span>
+                                        </a>
                                     </div>
                                 </div>
                             </li>

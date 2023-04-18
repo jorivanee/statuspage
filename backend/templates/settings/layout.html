@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}
+Settings > {% block settings_title %}{% endblock %}
+
+
+{% endblock %}
+
+{% block content %}
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="card">
+
+            <div class="row g-0">
+                <div class="col-3 d-none d-md-block border-end">
+                    <div class="card-body">
+                        <h4 class="subheader">Application settings</h4>
+                        <div class="list-group list-group-transparent">
+                            <a href="{{url_for('admin.get_settings_global')}}"
+                                class="list-group-item list-group-item-action d-flex align-items-center {% if request.path == url_for('admin.get_settings_global') %} active{% endif%}">Global
+                                Settings</a>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col d-flex flex-column">
+
+                    <form method="post" autocomplete="off" novalidate>
+                        <div class="card-body">
+                            <h2 class="mb-4">{{self.settings_title()}}</h2>
+                            {% from 'flashes.html' import success_flashes %}
+                            {% from 'flashes.html' import danger_flashes %}
+                            {{danger_flashes()}}{{success_flashes()}}
+                            {% block settings_content %}
+                            {% endblock %}
+                        </div>
+                        <div class="card-footer bg-transparent mt-auto">
+                            <div class="btn-list justify-content-end">
+                                <!-- <a href="#" class="btn">
+                                Cancel
+                            </a> -->
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

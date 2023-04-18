@@ -94,6 +94,15 @@ def get_status():
 def components():
     return jsonify(get_components())
 
+@api_blueprint.route("/metadata")
+def metadata():
+    keys = ['image_link', 'footer_text',
+            'footer_link', 'image_url', 'title']
+    data = {}
+    for key in keys:
+        data[key] = app._config[key]
+    return data
+
 
 @ api_blueprint.route("/incidents")
 def incidents():
@@ -114,5 +123,6 @@ def status_raw():
     return jsonify({
         "incidents": get_incidents()['data'],
         "components": get_components()['data'],
-        "status": get_status()
+        "status": get_status(),
+        "metadata":metadata()
     })
